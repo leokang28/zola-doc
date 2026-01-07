@@ -1,0 +1,345 @@
++++
+date = 2022-01-20T08:01:35+08:00
+description = "Enumerations and pattern matching for type-safe programming"
+draft = false
+title = "Enums and Pattern Matching"
+
+[extra]
+keywords = "rust, enum, pattern matching"
+series = "Rust"
+toc = true
+display_published = true
+
+[taxonomies]
+tags = [
+    "Rust",
+]
++++
+
+# Chapter 4 - Enums and Pattern Matching
+
+*enumerations 枚举*定义一个类型，用来穷举所有可能的数据。很多语言都有枚举类型，但它们的含义和用法有些差别。Rust 更接近于函数式编程语言中的枚举类型，_algebraic data types_。
+
+## Section 1 - 定义一个枚举
+
+先考虑一个场景，在这个场景下枚举比结构体更适合，比如需要做一个 IP 地址相关的功能。目前 IP 地址有个两个版本在使用中，V4 和 V6。所有 IP 地址只可能是这两个版本其中之一，所以我们可以用枚举穷举所有可能性。
+
+IP 地址这种确定性（只能在这两个版本中，总的集合确定）和互斥性（只能是其中之一）是枚举类型最好的使用场景。而且不管是哪个版本，归根结底它都是 IP 地址，它们属于同一类型，所以在编码过程中需要把它们当作同一个类型去操作。
+
+下面用代码说明，首先创建一个 IP 地址枚举类型。
+
+```rust
+enum IpAddrKind {
+    V4,
+    V6,
+}
+```
+
+### 枚举值
+
+实例化枚举值
+
+```rust
+let v4 = IpAddrKind::V4;
+let v6 = IpAddrKind::V6;
+```
+
+注意这两个值都是在`IpAddrKind`命名空间下的。这表示 V4 和 V6 都是同一类型的值，这种方式是很有用的，在后续处理中可以把它们都当作`IpAddrKind`类型来处理。比如定义一个函数接受`IpAddrKind`类型的数据。
+
+```rust
+fn route(address: IpAddrKind) {}
+```
+
+这个函数可以这样调用：
+
+```rust
+route(IpAddrKind::V4);
+route(IpAddrKind::V6);
+```
+
+使用枚举还有很多其他好处。比如，我们在存储 IP 地址时，不知道它是 V4 还是 V6 版本的，只知道是一个 IP 地址，也就是说我们只知道它的类型。我们使用之前的结构体来写一下代码。
+
+```rust
+enum IpAddrKind {
+    V4,
+    V6,
+}
+
+struct IpAddr {
+    type: IpAddrKind,
+    address: String,
+}
+
+let home = IpAddr {
+    type: IpAddrKind::V4,
+    address: String::from("127.0.0.1"),
+}
+
+let loopback = IpAddr {
+    type: IpAddrKind::V6,
+    address: String::from("::1"),
+}
+```
+
+这里定义了一个`IpAddr`类型来存储 IP 地址数据，它有两个字段：`type`是`IpAddrKind`类型的 IP 地址版本，`address`是`String`类型的 IP 地址数据。
+
+有一种更简洁的方式，仅用枚举类型来表示，而不需要结构体嵌套枚举类型。这种方式是将数据直接存入枚举变体的实例中。`IpAddrKind`枚举的定义也需要更改一下。
+
+```rust
+enum IpAddrKind {
+    V4(String),
+    V6(String),
+}
+
+let home = IpAddrKind::V4(String::from("127.0.0.1"));
+let loopback = IpAddrKind::V6(String::from("::1"));
+```
+
+此外还有一种方式。枚举类型变体可以拥有不同的类型和数据量，因此我们可以将`V4`类型定义成由 4 个整型数据组成的。
+
+```rust
+enum IpAddrKind {
+    V4(u8, u8, u8, u8)
+}
+let home = IpAddrKind::V4(127, 0, 0, 1);
+```
+
+IP 地址的存取是一个非常常用的功能，因此标准库已经实现了相关定义，编码人员可以直接使用。可以看看标准库是如何实现 IP 地址数据的定义的。
+
+```rust
+struct Ipv4Addr {
+
+}
+
+struct Ipv6Addr {
+
+}
+
+enum IpAddr {
+    V4(Ipv4Addr),
+    V6(Ipv6Addr),
+}
+```
+
+再来看另外一个例子，这个枚举类型下面有更多的字段和数据类型。
+
+```rust
+enum Message {
+    Quit,
+    Move {x: i32, y: i32},
+    Write(String),
+    ChangeColor(i32,i32,i32),
+}
+```
+
+这些字段都有不同的数据类型：
+
+- `Quit`没有数据与它关联。
+- `Move`包含了一个匿名结构。
+- `Write`包含了一个字符串。
+- `ChangeColor`包含了 3 个`i32`整数。
+
+这种方式与定义 4 个不同的结构体相似，不同点在于，枚举将他们都涵盖在了同一个类型`Message`下。下面都结构体定义可以与枚举变体存储一样都数据。
+
+```rust
+struct QuitMessage; // unit struct
+struct MoveMessage {
+    x: i32,
+    y: i32,
+}
+struct WriteMessage(String); // tuple struct
+struct ChangeColorMessage(i32, i32, i32); // tuple struct
+```
+
+枚举和结构体还有一个相似之处，都可以通过`impl`关键字对其进行方法扩展。
+
+```rust
+impl Message {
+    fn call(&self) {
+        // method body would be defined here
+    }
+}
+
+let m = Message::Write(String::from("hello"));
+m.call();
+```
+
+接下来再看另外一个标准库中很常用的枚举类：`Option`。
+
+### `Option`枚举类及它对`Null`的优势
+
+Option 枚举类在很多地方都会用到，因为它编码了一个很常见的情景：对变量的空值判断。用类型系统涵盖这个概念，代表编译器帮我们做了空值检查，可以在编译阶段就抛出错误，避免运行时 bug。并且 Rust 没有其他语言中`null`的功能。
+
+null 值的问题在于，当你把 null 作为一个非 null 变量使用时，会抛出一个类型错误。因为变量的空和非空是很常见的场景，很容易导致 bug。但是 null 却描述了一个很有用的概念：一个变量因为某些原因此时不可用或不存在。
+
+所以真正的问题不在于概念本身，而在于它的实现。因此 Rust 没有 null 值，取而代之是标准库实现的枚举类型用来描述值是否存在。这个枚举类型是`Option<T>`，它的定义如下
+
+```rust
+enum Option<T> {
+    Some<T>,
+    None,
+}
+```
+
+`Option`是默认引入的，不需要手动引入命名空间，它的枚举变体也是默认引入的，调用时不需要加`Option::`前缀。`<T>`是一个泛型参数，它可以代表任何类型，表示`Some`可以存储任何类型的数据。下面是一些使用的例子
+
+```rust
+let some_number = Some(5);
+let some_str = Some("a string");
+
+let absent_num: Option<i32> = None;
+```
+
+当使用`None`时，需要指定泛型是哪种数据类型，因为编译器无法通过`None`去推断`Some`的正确类型。
+
+为何使用`Option<T>`要优于使用 null 值？简单来说，`Option<T>`和`T`不是同一类型，编译器不会让我们使用`Option<T>`类型的值，就算它是一个有效值。
+
+```rust
+let x:i8 = 5;
+let y:Option<i8> = Some(10);
+let sum = x + y;
+
+// error[E0277]: cannot add `std::option::Option<i8>` to `i8`
+```
+
+如果运行这段代码，编译器会直接抛错。编译器不知道如何将`i8`类型和`Option<i8>`类型的数据作加法计算。当变量是`i8`类型时，编译器可以保证此时一定是一个有效值，所以不需要担心值不存在。当使用`Option<T>`类型的变量时，我们需要考虑值不存在的情况，编译器需要确保我们对这种情况做了处理。
+
+也就是说，在使用之前，需要先将`Option<T>`转换成`T`类型。在这个过程中可以捕获最常见的值为空但被错误使用的错误情况。
+
+如果一个值可能为空，首先必须手动指定该值为`Option<T>`类型。然后在使用该值时，处理值为空的逻辑是必须的。所以任何非`Option<T>`类型的数据，都可以被认为是非 null 的。这是 Rust 刻意的设计，为了限制代码中 null 值泛滥，增强代码的安全性。`Option<T>`有很多的方法扩展，可以读一下它的[文档](https://doc.rust-lang.org/std/option/enum.Option.html)。熟悉`Option<T>`的内部方法对学习 Rust 很有好处。
+
+通常为了使用`Option<T>`内部的`T`值，你的代码需要覆盖所有的枚举变体。某些代码仅在`Some<T>`运行，此时代码能够访问到内部的`T`数据。某些代码仅在`None`运行，作空值逻辑处理。`match`表达式是可以实现上述需求的一个控制流程。
+
+## Section 2 - `match`流程控制表达式
+
+`match`可以通过许多的*patterns（匹配模型）*去对比，并在相应的匹配模型命中的情况下执行某些代码。匹配模型可以是字面量值、变量、通配符等等。`match`流程控制强大之处在于丰富的匹配模型，以及编译器可以确认所有的可能情况都被涵盖。
+
+```rust
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter,
+}
+
+fn value_in_cents(coin: Coin) -> i8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter => 25,
+    }
+}
+```
+
+分析一下这段代码。`match`后紧跟一个表达式，在这里是变量`coin`。这里跟`if`有点类似，但是`if`后的表达式需要返回`bool`值，而`match`后可以返回任何类型的数据。
+
+接下来是*match arms*。每个 arm 由两个部分组成：一个匹配模型、一部分代码，两部分用`=>`操作符分割。arm 之间使用逗号分割。
+
+当`match`表达式执行时，首先将结果值和匹配模型对比，如果某个匹配模型被命中，则它后面的代码会被执行，否则进入下一个 arm 进行对比。
+
+每个 arm 要执行的代码是一个表达式，其返回值作为`match`表达式的返回值。如果需要执行多行代码，可以用花括号组成代码块。
+
+### 匹配模型绑定的数据
+
+`match`表达式的匹配模型可以绑定一些数据，这也是提取枚举变体中数据的方式。修改一下代码
+
+```rust
+#[derive(Debug)]
+enum UsState {
+    Alabama,
+    Alaska,
+    // --snip--
+}
+
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter(UsState),
+}
+
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter(state) => {
+            println!("State quarter from {:?}!", state);
+            25
+        }
+    }
+}
+```
+
+上面的代码在`Coin::Quarter`匹配模型中绑定了一个变量`state`，当该匹配模型命中时，`state`变量会绑定`Quarter`枚举变体中存储的数据，并且在该匹配模型后面的代码中，我们可以通过`state`变量使用这个数据。
+
+假如调用`value_in_cents(Coin::Quarter(UsState::Alabama));`，变量`coin`的值为`Coin::Quarter(UsState::Alabama)`。在 match 表达式中，最后一个匹配模型会命中，此时`state`变量绑定的值将会是`UsState::Alabama`，然后可以在`println!`表达式中使用该匹配模型内部绑定的状态值。
+
+### Matching with Option<T>
+
+实现一个函数接受一个`Option<i32>`作为参数，如果内部有值则+1，如果没有值则不做任何逻辑且返回`None`。
+
+```rust
+fn plus_one(x: Option<i32>) -> Option<i32> {
+    match x {
+        None => None,
+        Some(i) => Some(i + 1),
+    }
+}
+```
+
+### Matches 要全面
+
+```rust
+fn plus_one(x: Option<i32>) -> Option<i32> {
+    match x {
+        Some(i) => Some(i + 1),
+    }
+}
+
+// error[E0004]: non-exhaustive patterns: `None` not covered
+```
+
+上面的代码中，`None`的情况没有被覆盖到，因此有可能会出现 bug。好在 Rust 在编译阶段就能指出这个地方有问题。在`match`表达式中必须涵盖任何一种可能的情况，以保证代码的安全和健壮。
+
+### `_`占位符
+
+当不想列举一些可能情况时，可以用占位符`_`来替代。
+
+```rust
+let some_u8_value = 0u8;
+match some_u8_value {
+    1 => println!("one"),
+    3 => println!("three"),
+    5 => println!("five"),
+    7 => println!("seven"),
+    _ => (),
+}
+```
+
+`_`占位符会匹配所有的情况，因此需要将它放在最后面，以免覆盖我们想要处理的情况。
+
+当只需要处理所有情况之中的一种时，`match`表达式就显得有些啰嗦了。所以在这种场景下，Rust 为我们提供了`if let`。
+
+## Section 3 - `if let`流程控制表达式
+
+`if let`表达式可以让我们只关注一种需要处理的情况而忽略其他所有的情况。比如之前的例子
+
+```rust
+let some_u8_value = Some(0u8);
+match some_u8_value {
+    Some(3) => println!("three"),
+    _ => (),
+}
+```
+
+这里只处理了值为 3 的情况，其余情况都被省略了，此时`if let`要比`match`在书写上更加简洁。
+
+```rust
+if let Some(3) = some_u8_value {
+    println!("three");
+}
+```
+
+可以将`if let`理解为`match`的一种语法糖。还可以在后面加`else`分支，它的作用和`_`占位符是一样的效果。

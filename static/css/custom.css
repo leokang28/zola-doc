@@ -1,0 +1,46 @@
+/* 网站标题链接样式 */
+.site-title {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-right: 1em;
+}
+
+.site-title:hover {
+  text-decoration: underline;
+}
+
+/* 归档页面样式 */
+.archive-year {
+  margin-top: 2em;
+  margin-bottom: 1em;
+  border-bottom: 2px solid var(--accent, #666);
+  padding-bottom: 0.3em;
+}
+
+.archive-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.archive-item {
+  display: flex;
+  align-items: baseline;
+  margin: 0.5em 0;
+  padding: 0.3em 0;
+}
+
+.archive-date {
+  flex-shrink: 0;
+  width: 5em;
+  opacity: 0.7;
+  font-size: 0.9em;
+}
+
+.archive-link {
+  flex: 1;
+  text-decoration: none;
+}
+
+.archive-link:hover {
+  text-decoration: underline;
+}

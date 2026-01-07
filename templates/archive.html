@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="content-section">
+  {% set blog_section = get_section(path="blog/_index.md") %}
+  {% set all_pages = blog_section.pages %}
+
+  {# Group pages by year #}
+  {% set_global years = [] %}
+  {% for page in all_pages %}
+  {% if page.date %}
+  {% set year = page.date | date(format="%Y") %}
+  {% if year not in years %}
+  {% set_global years = years | concat(with=year) %}
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+
+  {# Sort years in descending order #}
+  {% set_global sorted_years = years | sort | reverse %}
+
+  {# Display posts grouped by year #}
+  {% for year in sorted_years %}
+  <h2 class="archive-year">{{ year }}</h2>
+  <ul class="archive-list">
+    {% for page in all_pages %}
+    {% if page.date %}
+    {% set page_year = page.date | date(format="%Y") %}
+    {% if page_year == year %}
+    <li class="archive-item">
+      <time class="archive-date">{{ page.date | date(format="%m-%d") }}</time>
+      <a href="{{ page.permalink }}" class="archive-link">{{ page.title }}</a>
+    </li>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+  </ul>
+  {% endfor %}
+</section>
+{% endblock %}
