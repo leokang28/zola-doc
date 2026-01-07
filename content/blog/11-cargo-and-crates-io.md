@@ -78,7 +78,7 @@ pub fn add_one(x: i32) -> i32 {
 我们描述了`add_one`函数的功能是什么，然后`Examples`下面是一个示例代码块。`cargo doc`命令可以基于这些描述生成 html 文档。这个命令运行了 Rust 提供的`rustdoc`工具，并且将生成的 html 文件放置于*target/doc*目录下。
 
 使用`--open`参数会在文档创建完成之后打开浏览器，效果如下：
-![rust doc](https://gitee.com/ksleo/source/raw/master/QQ20200901-165110@2x.png)
+![rust doc](/images/cargo/QQ20200901-165110@2x.png)
 
 #### 常用模块
 
@@ -105,7 +105,7 @@ pub fn add_one(x: i32) -> i32 {
 /// Adds one to the number given.
 ```
 
-![rust doc](https://gitee.com/ksleo/source/raw/master/QQ20200901-171515@2x.png)
+![rust doc](/images/cargo/QQ20200901-171515@2x.png)
 
 ### 使用`pub use`导出公有 API
 
@@ -150,7 +150,7 @@ pub mod utils {
 ```
 
 查看它的文档：
-![rust doc](https://gitee.com/ksleo/source/raw/master/QQ20200901-173414@2x.png)
+![rust doc](/images/cargo/QQ20200901-173414@2x.png)
 
 `PrimaryColor`、`SecondaryColor`和`mix`都没有在首页展示出来，需要我们手动点入这些模块。并且其他模块调用我们的包时，引用的链路特别长：
 
@@ -174,7 +174,7 @@ pub use self::utils::mix;
 ```
 
 `PrimaryColor`、`SecondaryColor`和`mix`都更容易找到了，文档如下：
-![rust doc](https://gitee.com/ksleo/source/raw/master/QQ20200901-174144@2x.png)
+![rust doc](/images/cargo/QQ20200901-174144@2x.png)
 
 并且调用者在引用代码，代码量也更少：
 

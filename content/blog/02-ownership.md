@@ -126,14 +126,15 @@ let s2 = s1;
 这个例子在写法上和上面的例子看起来一致，但是在行为上有很大的差别。下图说明了`String`类型底层所做的逻辑。`String`类型由左侧三部分组成：一个指向 heap 的内存地址，表示长度的值，表示容量的值，这组数据存储在 stack 上。右侧是 heap 上存储数据的内存。
 
 <!-- ![img4-1](https://gitee.com/ksleo/source/raw/master/trpl04-01.svg) -->
-<img src='https://gitee.com/ksleo/source/raw/master/trpl04-01.svg' style='display:block' width=350 height='auto'>
-length是指数据具体使用的内存字节长度，capacity是`String`类型从内存调度器申请到的内存字节长度。
+
+![img4-1](/images/ownership/trpl04-01.svg)
+length 是指数据具体使用的内存字节长度，capacity 是`String`类型从内存调度器申请到的内存字节长度。
 
 当把`s1`赋值给`s2`时，`String`数据被复制了，也就是指针、长度和容量这个数据结构被复制了，而具体存储在 heap 上的数据并没有被复制。
-<img src='https://gitee.com/ksleo/source/raw/master/trpl04-02.svg' style='display:block' width=350 height='auto'>
+![img4-2](/images/ownership/trpl04-02.svg)
 
 如果`s2 = s1`这段代码执行 heap 复制，如果在 heap 上的数据量过大，这将会是一个很昂贵的操作，性能带来损耗并且双倍的内存占用。
-<img src='https://gitee.com/ksleo/source/raw/master/trpl04-03.svg' style='display:block' width=350 height='auto'>
+![img4-3](/images/ownership/trpl04-03.svg)
 
 之前提到变量所在作用域执行结束时，Rust 会自动调用`drop`方法释放该段内存。但是在上面的例子中会出现问题：作用域结束时，`s1`和`s2`都执行释放操作，但是这两个指针指向的是同一个地址，这就会引起*多次释放同一内存*的问题。为了确保内存安全，Rust 在这种情况下有其他一些细节：Rust 不会去复制 heap 内存，而是认为`s1`已经是一个无效引用，在作用域执行结束时，Rust 不会执行任何与`s1`相关的释放操作。
 
@@ -149,7 +150,7 @@ println!("{}", s1);
 执行以上代码，编译器会抛出错误。
 
 如果你熟悉深复制和浅复制的概念，之前`String`类型下复制指针、长度和容量数据结构的操作，就可以认为是浅复制。但是由于 Rust 同时又让第一个值`s1`失效了，因此在 Rust 中称为*move*而不是*shallow copy*。在刚才的例子中，可以认为`s1`*move*到了`s2`。
-<img src='https://gitee.com/ksleo/source/raw/master/trpl04-04.svg' style='display:block' width=350 height='auto'>
+![img4-4](/images/ownership/trpl04-04.svg)
 
 #### Ways Variables and Data Interact: Clone
 
@@ -295,7 +296,7 @@ fn calculate_length(s: &String) -> usize { // s is a reference to a String
 ```
 
 首先 Tuple 被删除了，其次参数的定义和传递都加了一个`&`符号，这个符号代表的就是*references*，引用可以只读变量的值而不转移其所有权。
-<img src='https://gitee.com/ksleo/source/raw/master/trpl04-05.svg' style='display:block' width=500 height='auto'>
+![img4-5](/images/ownership/trpl04-05.svg)
 :::tip Note
 与*reference*相对的操作称为*dereference*，运算符是`*`。
 :::
@@ -466,7 +467,7 @@ let world = &s[6..11];
 ```
 
 切片和引用是类似的，不过是用`[start_index..end_index]`这种方式截断了字符串的一部分，该区间是左闭右开的。切片内部实现存储的是首地址和切片长度。
-<img src='https://gitee.com/ksleo/source/raw/master/trpl04-06.svg' style='display:block' width=500 height='auto'>
+![img4-6](/images/ownership/trpl04-06.svg)
 
 Rust 的`..`范围语法，如果定义的范围从 0 开始，那么 0 可以不写。所以，下面两种写法是一样的。
 
