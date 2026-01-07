@@ -29,10 +29,23 @@ if [[ -n $(git status -s) ]]; then
     fi
 fi
 
+# 获取当前分支名
+current_branch=$(git branch --show-current)
+echo -e "${YELLOW}当前分支: $current_branch${NC}"
+
 # 推送到 GitHub
 echo ""
 echo -e "${YELLOW}正在推送到 GitHub...${NC}"
-git push origin main
+
+# 检查是否有上游分支
+if git rev-parse --abbrev-ref --symbolic-full-name @{u} > /dev/null 2>&1; then
+    # 有上游分支，正常推送
+    git push
+else
+    # 没有上游分支，设置上游并推送
+    echo -e "${YELLOW}首次推送，设置上游分支...${NC}"
+    git push --set-upstream origin "$current_branch"
+fi
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓ 推送成功！${NC}"
@@ -46,6 +59,8 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "部署完成后访问："
     echo -e "${YELLOW}https://leokang28.github.io${NC}"
+    echo ""
+    echo -e "${YELLOW}注意：如果你的分支是 'master'，请确保 GitHub Actions 配置中也使用 'master'${NC}"
 else
     echo -e "${RED}✗ 推送失败${NC}"
     exit 1
