@@ -27,9 +27,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # 如果主题是 submodule，需要递归拉取
-          submodules: recursive
-          fetch-depth: 0
+          # 如果主题是 submodule，会自动拉取；如果不是，不影响
+          submodules: true
+          fetch-depth: 1
 
       - name: Install Zola
         uses: taiki-e/install-action@v2
