@@ -32,11 +32,9 @@ jobs:
           # 使用你在 Secret 中存好的 PAT
           personal_token: ${{ secrets.ZOLA_DEPLOY_KEY }}
 
-          # 【修改点 1】填写你的目标仓库（Repo-B）的全名
-          external_repository: leokang28/repo-b-name
+          external_repository: leokang28/leokang28.github.io
 
-          # 【修改点 2】目标仓库的分支（通常是 main 或 gh-pages）
-          publish_branch: main
+          publish_branch: master
 
           # Zola 默认生成的静态文件夹
           publish_dir: ./public
