@@ -11,7 +11,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo-A
+      - name: Checkout zola-docs
         uses: actions/checkout@v4
         with:
           submodules: true
@@ -26,7 +26,7 @@ jobs:
         run: zola build
 
       # 使用 peaceiris 插件跨仓库发布
-      - name: Deploy to Repo-B
+      - name: Deploy to leokang28.github.io
         uses: peaceiris/actions-gh-pages@v3
         with:
           # 使用你在 Secret 中存好的 PAT
@@ -39,5 +39,5 @@ jobs:
           # Zola 默认生成的静态文件夹
           publish_dir: ./public
 
-          # 如果 Repo-B 已经有内容，是否强制覆盖？true 代表覆盖
+          # 如果 leokang28.github.io 已经有内容，是否强制覆盖？true 代表覆盖
           force_modify: true
