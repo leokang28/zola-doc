@@ -276,7 +276,7 @@ fn value_in_cents(coin: Coin) -> u8 {
 
 假如调用`value_in_cents(Coin::Quarter(UsState::Alabama));`，变量`coin`的值为`Coin::Quarter(UsState::Alabama)`。在 match 表达式中，最后一个匹配模型会命中，此时`state`变量绑定的值将会是`UsState::Alabama`，然后可以在`println!`表达式中使用该匹配模型内部绑定的状态值。
 
-### Matching with Option<T>
+### Matching with Option&lt;T&gt;
 
 实现一个函数接受一个`Option<i32>`作为参数，如果内部有值则+1，如果没有值则不做任何逻辑且返回`None`。
 
