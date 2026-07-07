@@ -2,7 +2,7 @@
 date = 2026-06-23T23:30:00+08:00
 description = "从一段 C 代码出发，理解机器学习的核心思想"
 draft = false
-title = "机器学习初探"
+title = "线性回归与梯度下降"
 
 [extra]
 keywords = "machine learning"
@@ -18,7 +18,7 @@ tags = [
 ]
 +++
 
-# 机器学习初探
+# 用梯度下降法拟合直线
 
 ## 从一个简单的问题开始
 
