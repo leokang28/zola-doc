@@ -74,7 +74,7 @@ fn main() {
                     at src/libstd/sys_common/backtrace.rs:62
         7: std::sys_common::backtrace::print
                     at src/libstd/sys_common/backtrace.rs:49
-        8: std::panicking::default_hook::{{closure}}
+        8: std::panicking::default_hook::{{ "{{" }}closure}}
                     at src/libstd/panicking.rs:198
         9: std::panicking::default_hook
                     at src/libstd/panicking.rs:218
@@ -94,9 +94,9 @@ fn main() {
                     at /Users/ksleo/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/src/liballoc/vec.rs:1942
         17: p::main
                     at src/main.rs:5
-        18: std::rt::lang_start::{{closure}}
+        18: std::rt::lang_start::{{ "{{" }}closure}}
                     at /Users/ksleo/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/src/libstd/rt.rs:67
-        19: std::rt::lang_start_internal::{{closure}}
+        19: std::rt::lang_start_internal::{{ "{{" }}closure}}
                     at src/libstd/rt.rs:52
         20: std::panicking::try::do_call
                     at src/libstd/panicking.rs:297

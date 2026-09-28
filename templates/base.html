@@ -9,7 +9,8 @@
   <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ get_url(path=" rss.xml", trailing_slash=false)
     }}">
   {% endblock %}
-  <title>{{ config.title }}{% if page.title %} | {{ page.title }}{% endif %}</title>
+  <title>{{ config.title }}{% if page is defined and page.title %} | {{ page.title }}{% elif section is
+    defined and section.title %} | {{ section.title }}{% endif %}</title>
 
   <link rel="preload" href="{{ get_url(path='css/style.css') }}" as="style">
   <link rel="stylesheet" href="https://raw.githack.com/Speyll/suCSS/main/reset-min.css" crossorigin="anonymous">
